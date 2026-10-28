@@ -9,7 +9,7 @@ export const SITE_DESCRIPTION =
 export const AUTHOR = {
   name: 'Vikas Kumar Yadav',
   handle: '@ctrlaltvikas',
-  avatar: 'https://avatars.githubusercontent.com/u/1206121?v=4',
+  avatar: 'https://github.com/ctrlaltvikas.png',
   role: 'Technology Leader & Digital Strategist',
   tagline: 'Ex-Microsoft • Ex-PwC • NABARD Digital Strategy & Innovation',
   bio: 'Technology Leader and Digital Strategist with foundational experience at Microsoft, PwC, and NABARD. Writing at the intersections of large-scale systems architecture, cognitive psychology, philosophy, political economy, and rural development & agriculture.',
