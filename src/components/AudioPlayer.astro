@@ -1,0 +1,182 @@
+---
+// Browser Web Speech API Audio Player for article narration
+---
+
+<div
+  id="article-audio-player"
+  class="my-6 p-3.5 sm:p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between gap-4 transition-all"
+>
+  <div class="flex items-center gap-3">
+    <!-- Play/Pause Button -->
+    <button
+      id="tts-play-btn"
+      type="button"
+      class="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center shadow-sm hover:scale-105 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500"
+      aria-label="Listen to article"
+      title="Listen to this article"
+    >
+      <!-- Play Icon -->
+      <svg id="tts-play-icon" class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M8 5v14l11-7z"></path>
+      </svg>
+      <!-- Pause Icon -->
+      <svg id="tts-pause-icon" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>
+      </svg>
+    </button>
+
+    <!-- Narration Info + Visualizer -->
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100" id="tts-status">
+          Listen to article
+        </span>
+        <!-- Animated Audio Waveform -->
+        <div id="tts-wave" class="flex items-center gap-0.5 h-4 opacity-40">
+          <span class="bar w-1 bg-emerald-500 rounded-full h-1"></span>
+          <span class="bar w-1 bg-emerald-500 rounded-full h-1"></span>
+          <span class="bar w-1 bg-emerald-500 rounded-full h-1"></span>
+          <span class="bar w-1 bg-emerald-500 rounded-full h-1"></span>
+          <span class="bar w-1 bg-emerald-500 rounded-full h-1"></span>
+        </div>
+      </div>
+      <span class="text-[11px] text-zinc-500 dark:text-zinc-400 block" id="tts-time">
+        AI Voice Narration • Web Speech
+      </span>
+    </div>
+  </div>
+
+  <!-- Speed & Reset Controls -->
+  <div class="flex items-center gap-2">
+    <button
+      id="tts-speed-btn"
+      type="button"
+      class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors"
+      title="Change narration speed"
+    >
+      <span id="tts-speed-label">1.0x</span>
+    </button>
+  </div>
+</div>
+
+<script>
+  function setupTTS() {
+    const playBtn = document.getElementById('tts-play-btn');
+    const playIcon = document.getElementById('tts-play-icon');
+    const pauseIcon = document.getElementById('tts-pause-icon');
+    const wave = document.getElementById('tts-wave');
+    const statusText = document.getElementById('tts-status');
+    const speedBtn = document.getElementById('tts-speed-btn');
+    const speedLabel = document.getElementById('tts-speed-label');
+
+    if (!playBtn || !('speechSynthesis' in window)) {
+      const container = document.getElementById('article-audio-player');
+      if (container && !('speechSynthesis' in window)) {
+        container.style.display = 'none';
+      }
+      return;
+    }
+
+    const synth = window.speechSynthesis;
+    let utterance: SpeechSynthesisUtterance | null = null;
+    let isPlaying = false;
+    let isPaused = false;
+    const speeds = [1.0, 1.25, 1.5, 2.0];
+    let speedIndex = 0;
+
+    function getArticleText(): string {
+      const articleEl = document.querySelector('article.prose');
+      if (!articleEl) return '';
+      // Clone and strip code blocks & tables for smooth natural voice reading
+      const clone = articleEl.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll('pre, code, svg, button, script').forEach((el) => el.remove());
+      return clone.innerText.replace(/\s+/g, ' ').trim();
+    }
+
+    function startSpeaking() {
+      synth.cancel(); // Stop any pending speech
+      const text = getArticleText();
+      if (!text) return;
+
+      utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = speeds[speedIndex];
+      utterance.pitch = 1.0;
+
+      // Prefer a natural English voice if available
+      const voices = synth.getVoices();
+      const preferred = voices.find(
+        (v) => (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha') || v.name.includes('Daniel')) && v.lang.startsWith('en')
+      ) || voices.find((v) => v.lang.startsWith('en'));
+      if (preferred) utterance.voice = preferred;
+
+      utterance.onstart = () => {
+        isPlaying = true;
+        isPaused = false;
+        playIcon?.classList.add('hidden');
+        pauseIcon?.classList.remove('hidden');
+        wave?.classList.add('playing');
+        wave?.classList.remove('opacity-40');
+        if (statusText) statusText.textContent = 'Speaking...';
+      };
+
+      utterance.onend = () => {
+        resetPlayer();
+      };
+
+      utterance.onerror = () => {
+        resetPlayer();
+      };
+
+      synth.speak(utterance);
+    }
+
+    function resetPlayer() {
+      isPlaying = false;
+      isPaused = false;
+      playIcon?.classList.remove('hidden');
+      pauseIcon?.classList.add('hidden');
+      wave?.classList.remove('playing');
+      wave?.classList.add('opacity-40');
+      if (statusText) statusText.textContent = 'Listen to article';
+    }
+
+    playBtn.addEventListener('click', () => {
+      if (!isPlaying) {
+        startSpeaking();
+      } else if (isPlaying && !isPaused) {
+        synth.pause();
+        isPaused = true;
+        playIcon?.classList.remove('hidden');
+        pauseIcon?.classList.add('hidden');
+        wave?.classList.remove('playing');
+        if (statusText) statusText.textContent = 'Paused';
+      } else if (isPlaying && isPaused) {
+        synth.resume();
+        isPaused = false;
+        playIcon?.classList.add('hidden');
+        pauseIcon?.classList.remove('hidden');
+        wave?.classList.add('playing');
+        if (statusText) statusText.textContent = 'Speaking...';
+      }
+    });
+
+    if (speedBtn && speedLabel) {
+      speedBtn.addEventListener('click', () => {
+        speedIndex = (speedIndex + 1) % speeds.length;
+        const currentSpeed = speeds[speedIndex];
+        speedLabel.textContent = `${currentSpeed}x`;
+        if (isPlaying) {
+          // Restart with new speed
+          startSpeaking();
+        }
+      });
+    }
+
+    // Stop speaking when user navigates away
+    window.addEventListener('beforeunload', () => {
+      synth.cancel();
+    });
+  }
+
+  setupTTS();
+</script>

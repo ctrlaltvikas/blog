@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getRelativeUrl } from '../utils/url';
+---
+
+<BaseLayout title="Page Not Found (404)">
+  <div class="max-w-2xl mx-auto px-4 py-24 sm:py-32 text-center space-y-6">
+    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100">
+      404
+    </div>
+
+    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-950 dark:text-white">
+      Story Not Found
+    </h1>
+
+    <p class="text-base text-zinc-600 dark:text-zinc-400 max-w-md mx-auto">
+      The article or page you are looking for may have been moved, renamed, or is still being drafted.
+    </p>
+
+    <div class="pt-4 flex items-center justify-center gap-3">
+      <a
+        href={getRelativeUrl('/')}
+        class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-emerald-600 text-white hover:bg-emerald-500 shadow-sm transition-all"
+      >
+        Return to Home
+      </a>
+      <button
+        onclick="window.dispatchEvent(new CustomEvent('open-search'))"
+        class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all"
+      >
+        Search Articles (⌘K)
+      </button>
+    </div>
+  </div>
+</BaseLayout>

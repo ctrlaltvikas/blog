@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllTags, getAllPosts } from '../../utils/posts';
+import { getRelativeUrl } from '../../utils/url';
+
+const tags = await getAllTags();
+const allPosts = await getAllPosts();
+---
+
+<BaseLayout
+  title="Topics & Tags"
+  description="Explore all engineering topics, tags, and taxonomies."
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+    <!-- Header -->
+    <div class="space-y-3 mb-10 border-b border-zinc-200 dark:border-zinc-800 pb-8">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60">
+        Taxonomy Index
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-950 dark:text-white">
+        Explore by Topics & Tags
+      </h1>
+      <p class="text-base text-zinc-600 dark:text-zinc-400">
+        Browse articles by subject matter across {tags.length} active tags and {allPosts.length} publications.
+      </p>
+    </div>
+
+    <!-- Tags Cloud Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      {
+        tags.map(({ tag, count }) => (
+          <a
+            href={getRelativeUrl(`/tags/${tag}`)}
+            class="group p-5 rounded-2xl bg-zinc-50/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-emerald-500/60 dark:hover:border-emerald-500/60 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/20 transition-all shadow-xs"
+          >
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-lg font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                #{tag}
+              </span>
+              <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-zinc-200/60 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                {count} {count === 1 ? 'post' : 'posts'}
+              </span>
+            </div>
+            <span class="text-xs text-zinc-500 dark:text-zinc-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">
+              Explore stories tagged with #{tag} →
+            </span>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>

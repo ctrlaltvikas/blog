@@ -1,0 +1,212 @@
+---
+import { getAllPosts } from '../utils/posts';
+import { getRelativeUrl } from '../utils/url';
+import { formatDate } from '../utils/formatDate';
+
+const posts = await getAllPosts();
+const searchData = posts.map((p) => {
+  const slug = p.id.replace(/\.(md|mdx)$/, '');
+  return {
+    title: p.data.title,
+    description: p.data.description,
+    category: p.data.category,
+    tags: p.data.tags,
+    date: formatDate(p.data.pubDate),
+    url: getRelativeUrl(`/blog/${slug}`),
+  };
+});
+---
+
+<!-- Spotlight Search Modal Dialog -->
+<div
+  id="search-modal"
+  class="fixed inset-0 z-50 hidden bg-zinc-900/60 dark:bg-black/80 backdrop-blur-sm p-4 sm:p-6 md:p-20 flex items-start justify-center transition-all duration-200"
+  role="dialog"
+  aria-modal="true"
+>
+  <div
+    class="w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden flex flex-col max-h-[80vh] transform transition-all animate-in fade-in zoom-in-95 duration-150"
+  >
+    <!-- Search Input Header -->
+    <div class="relative border-b border-zinc-200 dark:border-zinc-800 p-4 flex items-center gap-3">
+      <svg class="w-5 h-5 text-zinc-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      </svg>
+      <input
+        id="search-input"
+        type="text"
+        placeholder="Search stories, topics, tags..."
+        class="w-full bg-transparent text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 text-base focus:outline-none"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <kbd
+        id="search-esc-hint"
+        class="hidden sm:inline-block px-2 py-0.5 text-xs text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-800 rounded border border-zinc-200 dark:border-zinc-700"
+      >
+        ESC
+      </kbd>
+    </div>
+
+    <!-- Search Results List -->
+    <div id="search-results" class="overflow-y-auto p-3 space-y-1.5 flex-1 divide-y divide-zinc-100 dark:divide-zinc-800/60">
+      <!-- Populated via script -->
+    </div>
+
+    <!-- Search Modal Footer -->
+    <div class="p-3 bg-zinc-50 dark:bg-zinc-950/50 border-t border-zinc-200 dark:border-zinc-800 text-[11px] text-zinc-500 dark:text-zinc-400 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span><kbd class="font-sans font-bold">↑↓</kbd> Navigate</span>
+        <span><kbd class="font-sans font-bold">↵</kbd> Select</span>
+        <span><kbd class="font-sans font-bold">ESC</kbd> Close</span>
+      </div>
+      <span id="search-count" class="font-medium"></span>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ searchData }}>
+  function initSearch() {
+    const modal = document.getElementById('search-modal');
+    const input = document.getElementById('search-input');
+    const resultsContainer = document.getElementById('search-results');
+    const countEl = document.getElementById('search-count');
+    let selectedIndex = 0;
+    let currentResults = [];
+
+    function openModal() {
+      if (!modal || !input) return;
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      input.value = '';
+      renderResults(searchData);
+      setTimeout(() => input.focus(), 50);
+    }
+
+    function closeModal() {
+      if (!modal) return;
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    // Global Cmd+K / Ctrl+K listener
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        if (modal?.classList.contains('hidden')) {
+          openModal();
+        } else {
+          closeModal();
+        }
+      }
+      if (e.key === 'Escape' && !modal?.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
+
+    // Custom event listener for button triggers
+    window.addEventListener('open-search', () => openModal());
+
+    // Dismiss on background click
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    // Filter results
+    function filterArticles(query) {
+      if (!query.trim()) return searchData;
+      const q = query.toLowerCase();
+      return searchData.filter((post) => {
+        const titleMatch = post.title.toLowerCase().includes(q);
+        const descMatch = post.description.toLowerCase().includes(q);
+        const tagMatch = post.tags.some((t) => t.toLowerCase().includes(q));
+        const catMatch = post.category.toLowerCase().includes(q);
+        return titleMatch || descMatch || tagMatch || catMatch;
+      });
+    }
+
+    function renderResults(posts) {
+      currentResults = posts;
+      selectedIndex = 0;
+      if (!resultsContainer) return;
+
+      if (countEl) {
+        countEl.textContent = `${posts.length} ${posts.length === 1 ? 'article' : 'articles'}`;
+      }
+
+      if (!posts.length) {
+        resultsContainer.innerHTML = `
+          <div class="py-12 text-center text-sm text-zinc-500 dark:text-zinc-400">
+            No articles found matching your query.
+          </div>
+        `;
+        return;
+      }
+
+      resultsContainer.innerHTML = posts
+        .map(
+          (post, index) => `
+          <a
+            href="${post.url}"
+            class="search-item block p-3 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800/80 transition-colors ${
+              index === 0 ? 'bg-zinc-100 dark:bg-zinc-800/80' : ''
+            }"
+            data-index="${index}"
+          >
+            <div class="flex items-center gap-2 text-[11px] text-zinc-400 dark:text-zinc-500 mb-1">
+              <span class="font-semibold text-emerald-600 dark:text-emerald-400">${post.category}</span>
+              <span>•</span>
+              <span>${post.date}</span>
+            </div>
+            <h5 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">${post.title}</h5>
+            <p class="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-1 mt-0.5">${post.description}</p>
+          </a>
+        `
+        )
+        .join('');
+
+      updateSelection();
+    }
+
+    function updateSelection() {
+      const items = resultsContainer?.querySelectorAll('.search-item');
+      if (!items) return;
+      items.forEach((item, idx) => {
+        if (idx === selectedIndex) {
+          item.classList.add('bg-zinc-100', 'dark:bg-zinc-800/80', 'ring-1', 'ring-emerald-500/30');
+          item.scrollIntoView({ block: 'nearest' });
+        } else {
+          item.classList.remove('bg-zinc-100', 'dark:bg-zinc-800/80', 'ring-1', 'ring-emerald-500/30');
+        }
+      });
+    }
+
+    input?.addEventListener('input', (e) => {
+      const q = e.target.value;
+      renderResults(filterArticles(q));
+    });
+
+    input?.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (currentResults.length > 0) {
+          selectedIndex = (selectedIndex + 1) % currentResults.length;
+          updateSelection();
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (currentResults.length > 0) {
+          selectedIndex = (selectedIndex - 1 + currentResults.length) % currentResults.length;
+          updateSelection();
+        }
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (currentResults[selectedIndex]) {
+          window.location.href = currentResults[selectedIndex].url;
+        }
+      }
+    });
+  }
+
+  initSearch();
+</script>

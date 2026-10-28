@@ -1,0 +1,46 @@
+---
+import { SITE_TITLE, AUTHOR } from '../consts';
+import { getRelativeUrl } from '../utils/url';
+
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="mt-auto border-t border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-950/40 py-12 transition-colors">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+      <!-- Left: Brand info -->
+      <div class="space-y-1 text-center md:text-left">
+        <span class="font-extrabold text-base tracking-tight text-zinc-900 dark:text-zinc-100">
+          {SITE_TITLE}
+        </span>
+        <p class="text-xs text-zinc-500 dark:text-zinc-400">
+          Written by <a href={AUTHOR.github} target="_blank" class="text-emerald-600 dark:text-emerald-400 hover:underline">{AUTHOR.name}</a>. Built with Astro & Tailwind.
+        </p>
+      </div>
+
+      <!-- Center: Navigation -->
+      <div class="flex items-center gap-4 text-xs font-medium text-zinc-600 dark:text-zinc-400">
+        <a href={getRelativeUrl('/')} class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          Stories
+        </a>
+        <a href={getRelativeUrl('/archive')} class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          Archive
+        </a>
+        <a href={getRelativeUrl('/tags')} class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          Topics
+        </a>
+        <a href={getRelativeUrl('/about')} class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          About
+        </a>
+        <a href={getRelativeUrl('/rss.xml')} class="hover:text-amber-500 transition-colors">
+          RSS
+        </a>
+      </div>
+
+      <!-- Right: GitHub / Year -->
+      <div class="text-xs text-zinc-400 dark:text-zinc-500 text-center md:text-right">
+        <span>© {currentYear} Vikas Yadav. Open source on GitHub Pages.</span>
+      </div>
+    </div>
+  </div>
+</footer>

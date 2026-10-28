@@ -1,0 +1,288 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import ReadingProgress from '../components/ReadingProgress.astro';
+import ReactionBar from '../components/ReactionBar.astro';
+import AudioPlayer from '../components/AudioPlayer.astro';
+import ReadingMode from '../components/ReadingMode.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import TextSelectionQuote from '../components/TextSelectionQuote.astro';
+import type { BlogPost } from '../utils/posts';
+import { formatDate } from '../utils/formatDate';
+import { getReadingTime } from '../utils/readingTime';
+import { getRelativeUrl } from '../utils/url';
+import { AUTHOR } from '../consts';
+
+interface Props {
+  post: BlogPost;
+  headings: { depth: number; slug: string; text: string }[];
+  prevPost?: BlogPost;
+  nextPost?: BlogPost;
+}
+
+const { post, headings, prevPost, nextPost } = Astro.props;
+const reading = getReadingTime(post.body || '');
+const postSlug = post.id.replace(/\.(md|mdx)$/, '');
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  articleDate={post.data.pubDate.toISOString()}
+>
+  <!-- Top Reading Progress Indicator -->
+  <ReadingProgress />
+
+  <!-- Article Container -->
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <!-- Breadcrumb / Back to stories -->
+    <div class="mb-6 flex items-center justify-between">
+      <a
+        href={getRelativeUrl('/')}
+        class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back to stories
+      </a>
+
+      <!-- Reading Mode Controls (Serif/Sans & Font Size) -->
+      <ReadingMode />
+    </div>
+
+    <!-- Article Header -->
+    <header class="max-w-3xl mx-auto space-y-4 mb-8">
+      <div class="flex items-center gap-2">
+        <a
+          href={getRelativeUrl(`/tags/${post.data.category.toLowerCase()}`)}
+          class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-md border border-emerald-200/50 dark:border-emerald-800/50"
+        >
+          {post.data.category}
+        </a>
+        <span class="text-xs text-zinc-400">•</span>
+        <span class="text-xs text-zinc-500 dark:text-zinc-400">{reading.text}</span>
+        <span class="text-xs text-zinc-400">•</span>
+        <span class="text-xs text-zinc-500 dark:text-zinc-400">{reading.words} words</span>
+      </div>
+
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-zinc-950 dark:text-white leading-[1.15]">
+        {post.data.title}
+      </h1>
+
+      <p class="text-lg sm:text-xl text-zinc-600 dark:text-zinc-300 leading-relaxed font-normal">
+        {post.data.description}
+      </p>
+
+      <!-- Author Card & Date (Medium style) -->
+      <div class="pt-4 flex items-center justify-between border-t border-zinc-200/80 dark:border-zinc-800/80 gap-4 flex-wrap">
+        <div class="flex items-center gap-3">
+          <img
+            src={post.data.authorAvatar || AUTHOR.avatar}
+            alt={post.data.author}
+            class="w-11 h-11 rounded-full ring-2 ring-emerald-500/20 object-cover"
+          />
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-sm text-zinc-900 dark:text-zinc-100">{post.data.author}</span>
+              <a
+                href={AUTHOR.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-medium"
+              >
+                Follow
+              </a>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+              <time datetime={post.data.pubDate.toISOString()}>Published on {formatDate(post.data.pubDate)}</time>
+              {
+                post.data.updatedDate && (
+                  <span>• Updated {formatDate(post.data.updatedDate)}</span>
+                )
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Built-in Web Speech TTS Narration Player -->
+      <AudioPlayer />
+    </header>
+
+    <!-- Main Content Grid: Reaction Bar (Left) + Article (Center) + TOC (Right) -->
+    <div class="relative flex flex-col lg:flex-row items-start justify-center gap-8 lg:gap-12">
+      <!-- Left Sticky Dev.to Reaction Bar (Desktop) -->
+      <aside class="hidden lg:block sticky top-24 self-start z-30">
+        <ReactionBar postSlug={postSlug} title={post.data.title} />
+      </aside>
+
+      <!-- Center: Article Prose -->
+      <article class="prose prose-zinc dark:prose-invert max-w-[720px] w-full min-w-0">
+        <slot />
+      </article>
+
+      <!-- Right: Sticky Table of Contents (Desktop) -->
+      <aside class="hidden xl:block sticky top-24 w-56 self-start space-y-6">
+        <TableOfContents headings={headings} />
+
+        <div class="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 text-xs space-y-2">
+          <span class="font-bold text-zinc-800 dark:text-zinc-200 block">About the Author</span>
+          <p class="text-zinc-500 dark:text-zinc-400 leading-relaxed">
+            {AUTHOR.bio}
+          </p>
+          <a
+            href={AUTHOR.github}
+            target="_blank"
+            class="text-emerald-600 dark:text-emerald-400 font-semibold inline-block hover:underline"
+          >
+            GitHub Profile →
+          </a>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Article Footer: Tags, Bio, Prev/Next -->
+    <footer class="max-w-3xl mx-auto mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-800 space-y-8">
+      <!-- Tag Pills (Dev.to style) -->
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-xs font-semibold text-zinc-400 dark:text-zinc-500">Tags:</span>
+        {
+          post.data.tags.map((tag) => (
+            <a
+              href={getRelativeUrl(`/tags/${tag}`)}
+              class="inline-flex items-center text-xs font-medium px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-950/50 dark:hover:text-emerald-400 border border-zinc-200/60 dark:border-zinc-700/60 transition-colors"
+            >
+              #{tag}
+            </a>
+          ))
+        }
+      </div>
+
+      <!-- Author Bio Box -->
+      <div class="p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 flex flex-col sm:flex-row items-center sm:items-start gap-5">
+        <img
+          src={post.data.authorAvatar || AUTHOR.avatar}
+          alt={post.data.author}
+          class="w-16 h-16 rounded-full ring-2 ring-emerald-500/20 object-cover flex-shrink-0"
+        />
+        <div class="space-y-2 text-center sm:text-left flex-1">
+          <div class="flex items-center justify-center sm:justify-between flex-wrap gap-2">
+            <div>
+              <h3 class="font-bold text-base text-zinc-900 dark:text-zinc-100">{post.data.author}</h3>
+              <span class="text-xs text-zinc-500 dark:text-zinc-400">{AUTHOR.handle}</span>
+            </div>
+            <a
+              href={AUTHOR.github}
+              target="_blank"
+              class="px-3 py-1 rounded-lg text-xs font-semibold bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
+            >
+              Follow
+            </a>
+          </div>
+          <p class="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
+            {AUTHOR.bio}
+          </p>
+        </div>
+      </div>
+
+      <!-- Next & Previous Article Navigation -->
+      {
+        (prevPost || nextPost) && (
+          <nav class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4" aria-label="Stories navigation">
+            {prevPost ? (
+              <a
+                href={getRelativeUrl(`/blog/${prevPost.id.replace(/\.(md|mdx)$/, '')}`)}
+                class="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-emerald-500 dark:hover:border-emerald-500/50 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/40 transition-all text-left group"
+              >
+                <span class="text-[11px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block mb-1">
+                  ← Previous story
+                </span>
+                <span class="text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 line-clamp-2 transition-colors">
+                  {prevPost.data.title}
+                </span>
+              </a>
+            ) : (
+              <div />
+            )}
+
+            {nextPost && (
+              <a
+                href={getRelativeUrl(`/blog/${nextPost.id.replace(/\.(md|mdx)$/, '')}`)}
+                class="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-emerald-500 dark:hover:border-emerald-500/50 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/40 transition-all text-right group"
+              >
+                <span class="text-[11px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block mb-1">
+                  Next story →
+                </span>
+                <span class="text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 line-clamp-2 transition-colors">
+                  {nextPost.data.title}
+                </span>
+              </a>
+            )}
+          </nav>
+        )
+      }
+    </footer>
+  </div>
+
+  <!-- Mobile Bottom Sticky Reaction Dock -->
+  <div class="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
+    <ReactionBar postSlug={postSlug} title={post.data.title} />
+  </div>
+
+  <!-- Medium Text Selection Popover -->
+  <TextSelectionQuote />
+
+  <!-- Dev.to Code Block Enhancer: Language badges & Copy Buttons -->
+  <script>
+    function enhanceCodeBlocks() {
+      const codeBlocks = document.querySelectorAll('article.prose pre');
+      codeBlocks.forEach((pre) => {
+        // Skip if already enhanced
+        if (pre.parentElement?.classList.contains('code-block-wrapper')) return;
+
+        const code = pre.querySelector('code');
+        const langMatch = code?.className.match(/language-(\w+)/);
+        const lang = langMatch ? langMatch[1] : 'code';
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper relative my-6 rounded-xl overflow-hidden border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-900 shadow-xs';
+
+        const header = document.createElement('div');
+        header.className = 'flex items-center justify-between px-4 py-2 bg-zinc-800/70 text-zinc-400 text-xs font-mono border-b border-zinc-700/40 select-none';
+        header.innerHTML = `
+          <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">${lang}</span>
+          <button type="button" class="copy-code-btn flex items-center gap-1.5 hover:text-white transition-colors focus:outline-none">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+            </svg>
+            <span class="copy-label text-[11px] font-semibold">Copy</span>
+          </button>
+        `;
+
+        pre.parentNode?.insertBefore(wrapper, pre);
+        wrapper.appendChild(header);
+        wrapper.appendChild(pre);
+
+        // Remove redundant margin and border on the pre inside wrapper
+        pre.style.margin = '0';
+        pre.style.border = 'none';
+        pre.style.borderRadius = '0';
+
+        const copyBtn = header.querySelector('.copy-code-btn');
+        const copyLabel = header.querySelector('.copy-label');
+        copyBtn?.addEventListener('click', async () => {
+          const text = code?.innerText || pre.innerText;
+          await navigator.clipboard.writeText(text);
+          if (copyLabel) {
+            copyLabel.textContent = 'Copied!';
+            setTimeout(() => {
+              copyLabel.textContent = 'Copy';
+            }, 2000);
+          }
+        });
+      });
+    }
+
+    enhanceCodeBlocks();
+  </script>
+</BaseLayout>

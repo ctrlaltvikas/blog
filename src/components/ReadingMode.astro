@@ -1,0 +1,110 @@
+---
+// Medium reading mode customizer (Serif/Sans and Font Size)
+---
+
+<div class="inline-flex items-center gap-1 p-1 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200/80 dark:border-zinc-700/80 text-xs">
+  <!-- Font Style: Sans vs Serif -->
+  <button
+    id="font-sans-btn"
+    type="button"
+    class="px-2 py-1 rounded-lg font-sans font-medium text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-all"
+    title="Sans-serif typography"
+  >
+    Sans
+  </button>
+  <button
+    id="font-serif-btn"
+    type="button"
+    class="px-2 py-1 rounded-lg font-serif font-medium text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-all"
+    title="Serif typography (Medium style)"
+  >
+    Serif
+  </button>
+
+  <span class="w-px h-3.5 bg-zinc-300 dark:bg-zinc-700 mx-0.5"></span>
+
+  <!-- Font Size: Small / Normal / Large -->
+  <button
+    id="size-sm-btn"
+    type="button"
+    class="px-1.5 py-1 rounded-lg text-[11px] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all"
+    title="Smaller text"
+  >
+    A-
+  </button>
+  <button
+    id="size-md-btn"
+    type="button"
+    class="px-1.5 py-1 rounded-lg text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all"
+    title="Default text size"
+  >
+    A
+  </button>
+  <button
+    id="size-lg-btn"
+    type="button"
+    class="px-1.5 py-1 rounded-lg text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all"
+    title="Larger text"
+  >
+    A+
+  </button>
+</div>
+
+<script>
+  function setupReadingMode() {
+    const sansBtn = document.getElementById('font-sans-btn');
+    const serifBtn = document.getElementById('font-serif-btn');
+    const smBtn = document.getElementById('size-sm-btn');
+    const mdBtn = document.getElementById('size-md-btn');
+    const lgBtn = document.getElementById('size-lg-btn');
+
+    // Font family preference
+    const savedFont = localStorage.getItem('reading_font') || 'sans';
+    applyFont(savedFont);
+
+    function applyFont(font: string) {
+      document.body.classList.remove('reading-font-sans', 'reading-font-serif');
+      document.body.classList.add(`reading-font-${font}`);
+      localStorage.setItem('reading_font', font);
+
+      if (font === 'serif') {
+        serifBtn?.classList.add('bg-white', 'dark:bg-zinc-700', 'text-zinc-900', 'dark:text-white', 'shadow-xs');
+        sansBtn?.classList.remove('bg-white', 'dark:bg-zinc-700', 'text-zinc-900', 'dark:text-white', 'shadow-xs');
+      } else {
+        sansBtn?.classList.add('bg-white', 'dark:bg-zinc-700', 'text-zinc-900', 'dark:text-white', 'shadow-xs');
+        serifBtn?.classList.remove('bg-white', 'dark:bg-zinc-700', 'text-zinc-900', 'dark:text-white', 'shadow-xs');
+      }
+    }
+
+    sansBtn?.addEventListener('click', () => applyFont('sans'));
+    serifBtn?.addEventListener('click', () => applyFont('serif'));
+
+    // Font size preference
+    const savedSize = localStorage.getItem('reading_size') || 'md';
+    applySize(savedSize);
+
+    function applySize(size: string) {
+      document.body.classList.remove('font-size-sm', 'font-size-md', 'font-size-lg');
+      document.body.classList.add(`font-size-${size}`);
+      localStorage.setItem('reading_size', size);
+
+      [
+        { btn: smBtn, key: 'sm' },
+        { btn: mdBtn, key: 'md' },
+        { btn: lgBtn, key: 'lg' },
+      ].forEach(({ btn, key }) => {
+        if (key === size) {
+          btn?.classList.add('bg-white', 'dark:bg-zinc-700', 'text-zinc-900', 'dark:text-white', 'shadow-xs');
+        } else {
+          btn?.classList.remove('bg-white', 'dark:bg-zinc-700', 'text-zinc-900', 'dark:text-white', 'shadow-xs');
+        }
+      });
+    }
+
+    smBtn?.addEventListener('click', () => applySize('sm'));
+    mdBtn?.addEventListener('click', () => applySize('md'));
+    lgBtn?.addEventListener('click', () => applySize('lg'));
+  }
+
+  setupReadingMode();
+</script>

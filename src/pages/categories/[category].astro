@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getAllCategories, getAllPosts, type BlogPost } from '../../utils/posts';
+import { slugify } from '../../utils/slugify';
+import { getRelativeUrl } from '../../utils/url';
+
+export async function getStaticPaths() {
+  const categories = await getAllCategories();
+  const allPosts = await getAllPosts();
+
+  return categories.map(({ category }) => {
+    const filteredPosts = allPosts.filter(
+      (p) => slugify(p.data.category || 'General') === slugify(category)
+    );
+    return {
+      params: { category: slugify(category) },
+      props: { posts: filteredPosts, rawCategory: category },
+    };
+  });
+}
+
+interface Props {
+  posts: BlogPost[];
+  rawCategory: string;
+}
+
+const { posts, rawCategory } = Astro.props;
+---
+
+<BaseLayout
+  title={`${rawCategory} Articles`}
+  description={`Browse all engineering articles in the ${rawCategory} category`}
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+    <!-- Header -->
+    <div class="space-y-3 mb-10 pb-6 border-b border-zinc-200 dark:border-zinc-800">
+      <div class="flex items-center gap-2">
+        <a
+          href={getRelativeUrl('/')}
+          class="text-xs font-semibold text-zinc-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+        >
+          ← Home
+        </a>
+      </div>
+
+      <div>
+        <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+          Category
+        </span>
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-950 dark:text-white mt-1">
+          {rawCategory}
+        </h1>
+        <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+          {posts.length} {posts.length === 1 ? 'article' : 'articles'} in this category.
+        </p>
+      </div>
+    </div>
+
+    <!-- Posts Feed -->
+    <div class="divide-y divide-zinc-200/70 dark:divide-zinc-800/70">
+      {posts.map((post) => (
+        <PostCard post={post} />
+      ))}
+    </div>
+  </div>
+</BaseLayout>

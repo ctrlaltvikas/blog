@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopicsNav from '../components/TopicsNav.astro';
+import HeroPost from '../components/HeroPost.astro';
+import PostCard from '../components/PostCard.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { getAllPosts } from '../utils/posts';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+
+const allPosts = await getAllPosts();
+const featuredPost = allPosts.find((p) => p.data.featured) || allPosts[0];
+const regularPosts = featuredPost
+  ? allPosts.filter((p) => p.id !== featuredPost.id)
+  : allPosts;
+---
+
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+  <!-- Medium-style Topics Bar -->
+  <TopicsNav activeTopic="all" />
+
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <!-- Featured Top Editorial Story (Medium + Dev.to hero) -->
+    {featuredPost && (
+      <div class="mb-12">
+        <HeroPost post={featuredPost} />
+      </div>
+    )}
+
+    <!-- Feed + Sidebar Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <!-- Main Feed Column -->
+      <div class="lg:col-span-8 space-y-2">
+        <div class="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            Latest Stories
+          </h2>
+          <span class="text-xs text-zinc-400 dark:text-zinc-500">
+            {allPosts.length} {allPosts.length === 1 ? 'article' : 'articles'} published
+          </span>
+        </div>
+
+        <div class="divide-y divide-zinc-200/70 dark:divide-zinc-800/70">
+          {
+            regularPosts.map((post) => (
+              <PostCard post={post} />
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Right Sidebar (Medium / Dev.to) -->
+      <div class="lg:col-span-4">
+        <div class="sticky top-24">
+          <Sidebar />
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

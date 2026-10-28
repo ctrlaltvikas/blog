@@ -1,0 +1,95 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getArchiveGroups } from '../utils/posts';
+import { formatDate } from '../utils/formatDate';
+import { getReadingTime } from '../utils/readingTime';
+import { getRelativeUrl } from '../utils/url';
+
+const archiveGroups = await getArchiveGroups();
+---
+
+<BaseLayout
+  title="Timeline Archive"
+  description="Chronological date-wise archive of all engineering stories, articles, and architecture notes."
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+    <!-- Header -->
+    <div class="space-y-3 mb-12 border-b border-zinc-200 dark:border-zinc-800 pb-8">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+        Chronological Timeline
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-950 dark:text-white">
+        Date-wise Archive
+      </h1>
+      <p class="text-base text-zinc-600 dark:text-zinc-400 max-w-2xl">
+        Every story, guide, and architectural retrospective ordered by date.
+      </p>
+    </div>
+
+    <!-- Timeline Years -->
+    <div class="space-y-16">
+      {
+        archiveGroups.map(({ year, months }) => (
+          <section class="space-y-8">
+            <!-- Year Header -->
+            <div class="flex items-center gap-4">
+              <h2 class="text-2xl font-black text-zinc-900 dark:text-zinc-100 font-mono tracking-tight">
+                {year}
+              </h2>
+              <div class="h-px flex-1 bg-gradient-to-r from-zinc-300 dark:from-zinc-700 to-transparent"></div>
+            </div>
+
+            <!-- Months in Year -->
+            <div class="space-y-8 pl-2 sm:pl-4 border-l-2 border-zinc-200 dark:border-zinc-800">
+              {months.map(({ monthName, posts }) => (
+                <div class="space-y-4">
+                  <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 pl-4">
+                    {monthName}
+                  </h3>
+
+                  <div class="space-y-3">
+                    {posts.map((post) => {
+                      const reading = getReadingTime(post.body || '');
+                      const postSlug = post.id.replace(/\.(md|mdx)$/, '');
+                      return (
+                        <a
+                          href={getRelativeUrl(`/blog/${postSlug}`)}
+                          class="group relative flex flex-col sm:flex-row sm:items-center justify-between p-3.5 -mx-3.5 rounded-xl hover:bg-zinc-100/70 dark:hover:bg-zinc-900/60 transition-all gap-2"
+                        >
+                          <div class="space-y-1 flex-1">
+                            <div class="flex items-center gap-2 text-xs">
+                              <span class="text-zinc-400 dark:text-zinc-500 font-mono">
+                                {formatDate(post.data.pubDate)}
+                              </span>
+                              <span class="text-zinc-300 dark:text-zinc-700">•</span>
+                              <span class="font-medium text-emerald-600 dark:text-emerald-400">
+                                {post.data.category}
+                              </span>
+                            </div>
+                            <h4 class="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                              {post.data.title}
+                            </h4>
+                          </div>
+
+                          <div class="flex items-center gap-3 text-xs text-zinc-400 dark:text-zinc-500 self-start sm:self-center">
+                            <span>{reading.text}</span>
+                            <span class="group-hover:translate-x-1 transition-transform text-emerald-600 dark:text-emerald-400 font-bold">
+                              →
+                            </span>
+                          </div>
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>

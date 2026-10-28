@@ -1,0 +1,76 @@
+---
+import type { BlogPost } from '../utils/posts';
+import { formatDate } from '../utils/formatDate';
+import { getReadingTime } from '../utils/readingTime';
+import { getRelativeUrl } from '../utils/url';
+import { AUTHOR } from '../consts';
+
+interface Props {
+  post: BlogPost;
+}
+
+const { post } = Astro.props;
+const reading = getReadingTime(post.body || '');
+const postSlug = post.id.replace(/\.(md|mdx)$/, '');
+const postUrl = getRelativeUrl(`/blog/${postSlug}`);
+---
+
+<article class="group relative rounded-2xl p-6 sm:p-8 bg-gradient-to-br from-emerald-50/40 via-white to-teal-50/30 dark:from-emerald-950/20 dark:via-zinc-900/60 dark:to-teal-950/10 border border-emerald-100/80 dark:border-emerald-900/40 shadow-sm hover:shadow-md transition-all duration-300">
+  <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+    <div class="flex-1 space-y-4">
+      <!-- Meta top: Category pill + Featured badge -->
+      <div class="flex items-center gap-2.5 flex-wrap">
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-600 text-white shadow-xs">
+          <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+          </svg>
+          Featured Story
+        </span>
+        <span class="text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
+          {post.data.category}
+        </span>
+        <span class="text-xs text-zinc-400 dark:text-zinc-500">•</span>
+        <span class="text-xs text-zinc-500 dark:text-zinc-400 font-medium">{reading.text}</span>
+      </div>
+
+      <!-- Title -->
+      <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+        <a href={postUrl} class="focus:outline-none">
+          <span class="absolute inset-0" aria-hidden="true"></span>
+          {post.data.title}
+        </a>
+      </h2>
+
+      <!-- Description / Excerpt -->
+      <p class="text-zinc-600 dark:text-zinc-300 text-sm sm:text-base leading-relaxed line-clamp-3">
+        {post.data.description}
+      </p>
+
+      <!-- Author info + Dev.to tags & reactions -->
+      <div class="pt-2 flex items-center justify-between flex-wrap gap-4 border-t border-zinc-100 dark:border-zinc-800/60">
+        <!-- Author mini card -->
+        <div class="flex items-center gap-3">
+          <img
+            src={post.data.authorAvatar || AUTHOR.avatar}
+            alt={post.data.author}
+            class="w-9 h-9 rounded-full ring-2 ring-emerald-500/20 object-cover"
+          />
+          <div class="text-xs">
+            <span class="font-semibold text-zinc-900 dark:text-zinc-100 block">{post.data.author}</span>
+            <span class="text-zinc-500 dark:text-zinc-400">{formatDate(post.data.pubDate)}</span>
+          </div>
+        </div>
+
+        <!-- Dev.to reactions teaser pill -->
+        <div class="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-700/60">
+            <span>❤️</span>
+            <span>🦄</span>
+            <span>💡</span>
+            <span class="font-medium text-zinc-700 dark:text-zinc-300 ml-0.5">Read story →</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>

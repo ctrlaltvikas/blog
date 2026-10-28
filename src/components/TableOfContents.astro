@@ -1,0 +1,82 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+const filteredHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+  filteredHeadings.length > 1 && (
+    <nav class="space-y-3" aria-label="Table of contents">
+      <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+        On this page
+      </h4>
+      <ul class="space-y-2 text-xs border-l border-zinc-200 dark:border-zinc-800" id="toc-list">
+        {filteredHeadings.map((h) => (
+          <li class={`${h.depth === 3 ? 'pl-5' : 'pl-3'}`}>
+            <a
+              href={`#${h.slug}`}
+              class="toc-link block text-zinc-500 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-0.5"
+              data-slug={h.slug}
+            >
+              {h.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<script>
+  function setupTOC() {
+    const links = document.querySelectorAll('.toc-link');
+    if (!links.length) return;
+
+    const headingElements: HTMLElement[] = [];
+    links.forEach((link) => {
+      const slug = (link as HTMLElement).dataset.slug;
+      if (slug) {
+        const el = document.getElementById(slug);
+        if (el) headingElements.push(el);
+      }
+    });
+
+    if (!headingElements.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const activeId = entry.target.id;
+            links.forEach((link) => {
+              if ((link as HTMLElement).dataset.slug === activeId) {
+                link.classList.add('text-emerald-600', 'dark:text-emerald-400', 'font-semibold', '-ml-px', 'border-l-2', 'border-emerald-500');
+                link.classList.remove('text-zinc-500', 'dark:text-zinc-400');
+              } else {
+                link.classList.remove('text-emerald-600', 'dark:text-emerald-400', 'font-semibold', '-ml-px', 'border-l-2', 'border-emerald-500');
+                link.classList.add('text-zinc-500', 'dark:text-zinc-400');
+              }
+            });
+          }
+        });
+      },
+      {
+        rootMargin: '0px 0px -70% 0px',
+        threshold: 0.1,
+      }
+    );
+
+    headingElements.forEach((h) => observer.observe(h));
+  }
+
+  setupTOC();
+</script>

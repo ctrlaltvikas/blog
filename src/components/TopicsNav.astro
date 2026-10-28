@@ -1,0 +1,51 @@
+---
+import { FEATURED_TOPICS } from '../consts';
+import { getRelativeUrl } from '../utils/url';
+
+interface Props {
+  activeTopic?: string;
+}
+
+const { activeTopic = 'all' } = Astro.props;
+---
+
+<div class="border-b border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/30">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <div class="flex items-center gap-2 overflow-x-auto py-3 no-scrollbar scroll-smooth">
+      {
+        FEATURED_TOPICS.map((topic) => {
+          const isActive = activeTopic.toLowerCase() === topic.slug.toLowerCase();
+          const href =
+            topic.slug === 'all'
+              ? getRelativeUrl('/')
+              : getRelativeUrl(`/tags/${topic.slug}`);
+
+          return (
+            <a
+              href={href}
+              class={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+                isActive
+                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
+              }`}
+            >
+              {topic.name}
+            </a>
+          );
+        })
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+</style>

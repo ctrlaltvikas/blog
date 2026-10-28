@@ -1,0 +1,106 @@
+---
+import type { BlogPost } from '../utils/posts';
+import { formatDate } from '../utils/formatDate';
+import { getReadingTime } from '../utils/readingTime';
+import { getRelativeUrl } from '../utils/url';
+import { AUTHOR } from '../consts';
+
+interface Props {
+  post: BlogPost;
+}
+
+const { post } = Astro.props;
+const reading = getReadingTime(post.body || '');
+const postSlug = post.id.replace(/\.(md|mdx)$/, '');
+const postUrl = getRelativeUrl(`/blog/${postSlug}`);
+---
+
+<article class="group relative py-6 border-b border-zinc-200/70 dark:border-zinc-800/70 last:border-b-0 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/40 rounded-xl px-3 -mx-3 transition-colors duration-150">
+  <div class="space-y-3">
+    <!-- Author Row -->
+    <div class="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
+      <div class="flex items-center gap-2">
+        <img
+          src={post.data.authorAvatar || AUTHOR.avatar}
+          alt={post.data.author}
+          class="w-6 h-6 rounded-full object-cover ring-1 ring-zinc-300 dark:ring-zinc-700"
+        />
+        <span class="font-medium text-zinc-800 dark:text-zinc-200">{post.data.author}</span>
+        <span>•</span>
+        <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+      </div>
+
+      <span class="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200/50 dark:border-emerald-800/50">
+        {post.data.category}
+      </span>
+    </div>
+
+    <!-- Title & Description -->
+    <div class="space-y-1.5">
+      <h3 class="text-lg sm:text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+        <a href={postUrl} class="focus:outline-none">
+          <span class="absolute inset-0" aria-hidden="true"></span>
+          {post.data.title}
+        </a>
+      </h3>
+
+      <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed line-clamp-2">
+        {post.data.description}
+      </p>
+    </div>
+
+    <!-- Tags + Meta row (Dev.to style) -->
+    <div class="flex items-center justify-between pt-1 gap-2 flex-wrap">
+      <!-- Tag pills -->
+      <div class="flex items-center gap-1.5 flex-wrap z-10">
+        {
+          post.data.tags.slice(0, 3).map((tag) => (
+            <a
+              href={getRelativeUrl(`/tags/${tag}`)}
+              class="text-xs text-zinc-500 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 px-2 py-0.5 rounded transition-colors"
+            >
+              #{tag}
+            </a>
+          ))
+        }
+      </div>
+
+      <!-- Reading Time & Dev.to reaction preview -->
+      <div class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400">
+        <span class="flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          {reading.text}
+        </span>
+        <span class="hidden sm:inline-flex items-center gap-1 text-zinc-400 group-hover:text-red-500 transition-colors">
+          <span>❤️</span>
+          <span class="post-preview-reactions font-medium" data-post={postSlug}></span>
+        </span>
+      </div>
+    </div>
+  </div>
+</article>
+
+<script>
+  function updateFeedReactions() {
+    function hashString(str: string) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = (hash << 5) - hash + str.charCodeAt(i);
+        hash |= 0;
+      }
+      return hash;
+    }
+
+    document.querySelectorAll('.post-preview-reactions').forEach((el) => {
+      const slug = (el as HTMLElement).dataset.post || '';
+      const base = Math.floor(Math.abs(hashString(slug + 'heart') % 24) + 12);
+      const saved = JSON.parse(localStorage.getItem(`tb_reactions_${slug}`) || '{}');
+      const clicks = (saved.userClicks && saved.userClicks.heart) || 0;
+      el.textContent = String(base + clicks);
+    });
+  }
+
+  updateFeedReactions();
+</script>

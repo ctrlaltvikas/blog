@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import TopicsNav from '../../components/TopicsNav.astro';
+import { getAllTags, getAllPosts, type BlogPost } from '../../utils/posts';
+import { getRelativeUrl } from '../../utils/url';
+
+export async function getStaticPaths() {
+  const tags = await getAllTags();
+  const allPosts = await getAllPosts();
+
+  return tags.map(({ tag }) => {
+    const filteredPosts = allPosts.filter((p) =>
+      p.data.tags.map((t) => t.toLowerCase().trim()).includes(tag.toLowerCase().trim())
+    );
+    return {
+      params: { tag },
+      props: { posts: filteredPosts, tag },
+    };
+  });
+}
+
+interface Props {
+  posts: BlogPost[];
+  tag: string;
+}
+
+const { posts, tag } = Astro.props;
+---
+
+<BaseLayout
+  title={`#${tag} Articles`}
+  description={`Browse all articles, tutorials and guides tagged with #${tag}`}
+>
+  <TopicsNav activeTopic={tag} />
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+    <!-- Header -->
+    <div class="space-y-3 mb-10 pb-6 border-b border-zinc-200 dark:border-zinc-800">
+      <div class="flex items-center gap-2">
+        <a
+          href={getRelativeUrl('/tags')}
+          class="text-xs font-semibold text-zinc-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+        >
+          ← All tags
+        </a>
+      </div>
+
+      <div class="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-950 dark:text-white">
+            #{tag}
+          </h1>
+          <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+            Collection of {posts.length} {posts.length === 1 ? 'story' : 'stories'} tagged with #{tag}.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Posts Feed -->
+    <div class="divide-y divide-zinc-200/70 dark:divide-zinc-800/70">
+      {posts.map((post) => (
+        <PostCard post={post} />
+      ))}
+    </div>
+  </div>
+</BaseLayout>
