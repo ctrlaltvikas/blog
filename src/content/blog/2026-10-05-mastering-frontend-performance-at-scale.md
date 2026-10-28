@@ -2,7 +2,7 @@
 title: "Mastering Frontend Performance: Zero-JS Islands, Core Web Vitals & INP"
 description: "Why shipping megabytes of client-side JavaScript is killing user experience, and how modern partial hydration and content-first architectures deliver sub-100ms interactions."
 pubDate: 2026-10-05
-author: "Vikas Yadav"
+author: "Vikas Kumar Yadav"
 category: "Frontend Architecture"
 tags: ["frontend-architecture", "performance", "web-perf", "astro"]
 featured: false

@@ -1,27 +1,49 @@
 // Global site configuration and metadata
 
-export const SITE_TITLE = 'Thinking Bytes';
-export const SITE_TAGLINE = 'Notes on Software Engineering, Distributed Systems, AI & Modern Web';
+export const SITE_TITLE = 'Thinking Bytes by ctrlaltvikas';
+export const SITE_TAGLINE =
+  'Reflections at the Intersection of Technology, Philosophy, Psychology, Politics & Rural Development';
 export const SITE_DESCRIPTION =
-  'A modern engineering publication by Vikas Yadav, exploring systems architecture, agentic workflows, frontend craft, and software design.';
+  'An interdisciplinary publication by Vikas Kumar Yadav (@ctrlaltvikas). Exploring system architecture, philosophy of mind, cognitive psychology, political economy, governance, and rural development & agriculture.';
 
 export const AUTHOR = {
-  name: 'Vikas Yadav',
+  name: 'Vikas Kumar Yadav',
   handle: '@ctrlaltvikas',
   avatar: 'https://avatars.githubusercontent.com/u/1206121?v=4',
-  bio: 'Staff Software Engineer & Systems Architect. Writing about distributed systems, modern web architecture, and building intelligent software.',
+  role: 'Technology Leader & Digital Strategist',
+  tagline: 'Ex-Microsoft • Ex-PwC • NABARD Digital Strategy & Innovation',
+  bio: 'Technology Leader and Digital Strategist with foundational experience at Microsoft, PwC, and NABARD. Writing at the intersections of large-scale systems architecture, cognitive psychology, philosophy, political economy, and rural development & agriculture.',
   github: 'https://github.com/ctrlaltvikas',
-  twitter: 'https://twitter.com/',
-  linkedin: 'https://linkedin.com/in/',
-  location: 'Bengaluru, India',
+  linkedin: 'https://www.linkedin.com/in/ctrlaltvikas',
+  twitter: 'https://twitter.com/ctrlaltvikas',
+  email: 'vikasharry03@gmail.com',
+  website: 'https://ctrlaltvikas.github.io',
+  stackoverflow: 'https://stackoverflow.com/users/4778809/vikas-yadav',
+  medium: 'https://medium.com/@vikasharry03',
+  location: 'India',
+  interests: [
+    'System Architecture & Distributed Systems',
+    'Cognitive Psychology & Human Behavior',
+    'Philosophy & Mental Models',
+    'Politics, Policy & Governance',
+    'Rural Development & Digital Public Infrastructure',
+    'Agriculture, Agri-FinTech & Sustainable Growth',
+    'Engineering Leadership & High-Trust Culture',
+  ],
+  projects: [
+    { name: 'Awesome-Bash-Aliases', url: 'https://github.com/ctrlaltvikas/Awesome-Bash-Aliases' },
+    { name: 'Indian-Gov-API-List', url: 'https://github.com/ctrlaltvikas/Indian-Gov-API-List' },
+    { name: 'cover-card', url: 'https://github.com/ctrlaltvikas/cover-card' },
+  ],
 };
 
 export const FEATURED_TOPICS = [
   { slug: 'all', name: 'All Stories' },
-  { slug: 'distributed-systems', name: 'Distributed Systems' },
-  { slug: 'ai-agents', name: 'AI & Agents' },
-  { slug: 'frontend-architecture', name: 'Frontend Arch' },
-  { slug: 'performance', name: 'Performance' },
-  { slug: 'cloud-devops', name: 'Cloud & DevOps' },
-  { slug: 'engineering-craft', name: 'Engineering Craft' },
+  { slug: 'system-architecture', name: 'Architecture' },
+  { slug: 'psychology', name: 'Psychology' },
+  { slug: 'philosophy', name: 'Philosophy' },
+  { slug: 'politics', name: 'Politics & Governance' },
+  { slug: 'rural-development', name: 'Rural Development' },
+  { slug: 'agriculture', name: 'Agriculture' },
+  { slug: 'leadership', name: 'Leadership' },
 ];

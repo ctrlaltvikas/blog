@@ -11,10 +11,10 @@ const currentYear = new Date().getFullYear();
       <!-- Left: Brand info -->
       <div class="space-y-1 text-center md:text-left">
         <span class="font-extrabold text-base tracking-tight text-zinc-900 dark:text-zinc-100">
-          {SITE_TITLE}
+          Thinking Bytes <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 font-mono">by ctrlaltvikas</span>
         </span>
         <p class="text-xs text-zinc-500 dark:text-zinc-400">
-          Written by <a href={AUTHOR.github} target="_blank" class="text-emerald-600 dark:text-emerald-400 hover:underline">{AUTHOR.name}</a>. Built with Astro & Tailwind.
+          By <a href={AUTHOR.github} target="_blank" class="text-emerald-600 dark:text-emerald-400 hover:underline">{AUTHOR.name}</a> ({AUTHOR.handle}). {AUTHOR.role}.
         </p>
       </div>
 

@@ -8,7 +8,7 @@ const blog = defineCollection({
     description: z.string(),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
-    author: z.string().default('Vikas Yadav'),
+    author: z.string().default('Vikas Kumar Yadav'),
     authorAvatar: z.string().optional(),
     authorBio: z.string().optional(),
     category: z.string().default('Engineering'),

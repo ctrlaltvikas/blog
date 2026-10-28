@@ -2,7 +2,7 @@
 title: "Welcome to Thinking Bytes: An Editorial Space for Engineering Craft"
 description: "Why I decided to build a self-hosted engineering publication combining Medium's refined typography, Dev.to's interactive developer spirit, and Astro's static velocity."
 pubDate: 2026-10-29
-author: "Vikas Yadav"
+author: "Vikas Kumar Yadav"
 category: "Engineering Craft"
 tags: ["engineering-craft", "web-architecture", "open-source", "astro"]
 featured: false

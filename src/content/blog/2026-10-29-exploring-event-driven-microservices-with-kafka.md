@@ -2,7 +2,7 @@
 title: "Event-Driven Microservices with Kafka: Idempotency & Outbox Pattern"
 description: "A battle-tested guide to guaranteeing at-least-once delivery, deterministic event sequencing, consumer group rebalancing, and avoiding dual-write discrepancies with the Transactional Outbox pattern."
 pubDate: 2026-10-29
-author: "Vikas Yadav"
+author: "Vikas Kumar Yadav"
 category: "Distributed Systems"
 tags: ["kafka", "event-driven", "architecture", "distributed-systems"]
 featured: false

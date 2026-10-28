@@ -73,9 +73,9 @@ async function createPost() {
 
   let category = parsed.category;
   if (!category && process.stdin.isTTY) {
-    category = await prompt('Category [Distributed Systems / AI & Agents / Frontend Arch / Performance / Cloud & DevOps] (default: Distributed Systems): ');
+    category = await prompt('Category [System Architecture / Psychology / Philosophy / Politics / Rural Development / Agriculture / Leadership] (default: System Architecture): ');
   }
-  category = category || 'Distributed Systems';
+  category = category || 'System Architecture';
 
   let rawTags = parsed.tags;
   if (!rawTags && process.stdin.isTTY) {
@@ -111,7 +111,7 @@ async function createPost() {
 title: "${title}"
 description: "A concise executive summary and teaser for this article that hooks the reader."
 pubDate: ${dateStr}
-author: "Vikas Yadav"
+author: "Vikas Kumar Yadav"
 category: "${category}"
 tags: ${JSON.stringify(tagsList)}
 featured: false

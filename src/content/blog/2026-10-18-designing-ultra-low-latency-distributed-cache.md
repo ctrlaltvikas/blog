@@ -2,7 +2,7 @@
 title: "Designing an Ultra-Low Latency Distributed Cache: Stampede Protection & Coherence"
 description: "A comprehensive teardown of singleflight locks, two-tier cache hierarchies, lease-based consistency, and mitigating tail latencies under millions of QPS."
 pubDate: 2026-10-18
-author: "Vikas Yadav"
+author: "Vikas Kumar Yadav"
 category: "Distributed Systems"
 tags: ["distributed-systems", "performance", "caching", "architecture"]
 featured: false

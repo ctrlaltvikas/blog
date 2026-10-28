@@ -11,7 +11,7 @@ const latestPosts = (await getAllPosts()).slice(0, 3);
 <aside class="space-y-8">
   <!-- Author Bio Card (Medium / Dev.to style) -->
   <div class="rounded-2xl p-6 bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/80">
-    <div class="flex items-center gap-3.5 mb-4">
+    <div class="flex items-center gap-3.5 mb-3">
       <img
         src={AUTHOR.avatar}
         alt={AUTHOR.name}
@@ -19,23 +19,35 @@ const latestPosts = (await getAllPosts()).slice(0, 3);
       />
       <div>
         <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-base">{AUTHOR.name}</h4>
-        <span class="text-xs text-zinc-500 dark:text-zinc-400 block">{AUTHOR.handle}</span>
-        <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">{AUTHOR.location}</span>
+        <span class="text-xs text-emerald-600 dark:text-emerald-400 font-mono font-medium block">{AUTHOR.handle}</span>
+        <span class="text-[11px] text-zinc-500 dark:text-zinc-400 block">{AUTHOR.role}</span>
       </div>
+    </div>
+
+    <div class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/70 px-2.5 py-1 rounded-md mb-3 border border-zinc-200/60 dark:border-zinc-700/60">
+      {AUTHOR.tagline}
     </div>
 
     <p class="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed mb-4">
       {AUTHOR.bio}
     </p>
 
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 mb-3">
       <a
         href={AUTHOR.github}
         target="_blank"
         rel="noopener noreferrer"
         class="flex-1 text-center py-1.5 px-3 rounded-lg text-xs font-semibold bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors shadow-xs"
       >
-        Follow on GitHub
+        GitHub
+      </a>
+      <a
+        href={AUTHOR.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex-1 text-center py-1.5 px-3 rounded-lg text-xs font-semibold bg-[#0A66C2] text-white hover:bg-[#095196] transition-colors shadow-xs"
+      >
+        LinkedIn
       </a>
       <a
         href={getRelativeUrl('/about')}

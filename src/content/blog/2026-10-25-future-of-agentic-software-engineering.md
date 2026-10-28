@@ -2,7 +2,7 @@
 title: "The Architecture of Agentic Software Engineering: Beyond Simple Autocomplete"
 description: "How autonomous coding agents, tool-calling loops, and sandbox isolation are reshaping the software development lifecycle from prompt toys to mission-critical systems."
 pubDate: 2026-10-25
-author: "Vikas Yadav"
+author: "Vikas Kumar Yadav"
 category: "AI & Agents"
 tags: ["ai-agents", "llm", "software-architecture", "developer-tooling"]
 featured: true
